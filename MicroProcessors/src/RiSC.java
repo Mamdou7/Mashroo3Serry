@@ -1,26 +1,63 @@
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.StringTokenizer;
-
 
 public class RiSC {
 
 	/**
 	 * @param args
 	 */
+
+
+
 	static short[] registers = new short[8];
 	static Cache[] caches;
 	static short[]memory = new short[64*1024/16];
 	static int pc = 0;
 	
-	
-	
-	public static void main(String [] args) throws IOException {
+
+	public static void main(String[] args) throws Exception {
+		// TODO Auto-generated method stub
+		
+		System.out.println("Please enter the number of cashes levels");
+
+		BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
+		
+		int cashlevels = Integer.parseInt(input.readLine());
+		
+		CacheManager mng = new CacheManager(cashlevels, memory);
+		// LRU TRUE       RANDOM FALSE
+		for(int i=0;i<cashlevels;i++) {
+			System.out.println("Enter S L M ");
+			StringTokenizer line = new StringTokenizer(input.readLine());
+			int S = Integer.parseInt(line.nextToken());
+			int L = Integer.parseInt(line.nextToken());
+			int M = Integer.parseInt(line.nextToken());
+System.out.println("Enter 'LRU' or 'Random'for the writing policy");
+            String x = input.readLine();
+            boolean type = false;
+            if(x.equals("LRU")) type = true; 
+           System.out.println("Please enter the Number of cycles required to access");
+            int cycles = Integer.parseInt(input.readLine());
+		mng.createCache(S, L, M, type,cycles);
+		}
+		
 		Input();
 		Execute();
+		memory[5] = 10;
+		memory[6] = 20;
+
+		int val = mng.getEntry(5, "Data");
+		System.out.println("-----------> " + mng.getMisses() + " " + mng.getMemCalls() + " " + mng.getHits() + " " + val);
+		System.out.println("HAHAHHAHA");
+		val = mng.getEntry(6, "Data");
+		System.out.println("HAHAHHAHA");
+		System.out.println("-----------> " + mng.getMisses() + " " + mng.getMemCalls() + " " + mng.getHits() + " " + val);
+		val = mng.getEntry(5, "Data");
+		System.out.println("-----------> " + mng.getMisses() + " " + mng.getMemCalls() + " " + mng.getHits() + " " + val);
 	}
-	
 
 		
 		
@@ -263,3 +300,4 @@ public class RiSC {
 	
 
 }
+
