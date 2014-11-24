@@ -75,7 +75,7 @@ public class RiSC {
 	
 
 	}
-	static void add(int Rd,int Rs,int Rt) {
+	static void load(int Rd,int Rs,int imm) {
 		
 	}
 	
