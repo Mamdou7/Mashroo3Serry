@@ -157,7 +157,7 @@ public class Cache {
 	}
 
 	public Integer getEntry(CacheEntry entry, String cacheType) {
-		System.out.println("first " + entry.getIndex() + " " + entry.getAddress() + " " + entry.getDisp());
+		System.out.println("first of all " + entry.getIndex() + " " + entry.getAddress() + " " + entry.getDisp());
 		int index, tag, disp;
 		Integer searched = null;
 		tag = entry.getTag();
@@ -169,13 +169,14 @@ public class Cache {
 	}
 
 	private Integer search(int index, int disp, int tag, String type) {
-		System.out.println("ins " + index);
+		System.out.println("ins " + index + " ");
 		if(type.equals("Data")) {
 			for(int i=0; i < dataCache[index].size();i++) {
 				// check all words in each block
 				CacheEntry thisOne = dataCache[index].get(i)[disp]; 
 				System.out.println(thisOne.getAddress() + " in " + thisOne.getValue());
 				if(thisOne != null && thisOne.getTag() == tag) {
+					System.out.println("RETURNED");
 					return thisOne.getValue(); 
 				}
 			}

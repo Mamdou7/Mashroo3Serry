@@ -26,6 +26,7 @@ public class CacheManager {
 	public Integer getEntry(int address, String type) {
 		// search the caches level by level
 		for(int i=0;i < cacheLevel;i++) {
+			System.out.println("LVLV " + i);
 			int tagSize = caches[i].getTag();
 			int indexSize = caches[i].getIndex();
 			int dispSize = caches[i].getDisp();

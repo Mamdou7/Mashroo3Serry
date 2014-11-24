@@ -11,8 +11,8 @@ public class RiSC {
 	 */
 	public static void main(String[] args) throws Exception {
 		// TODO Auto-generated method stub
-			Input();
-		 Execute();
+//			Input();
+//		 Execute();
 		memory[5] = 10;
 		memory[6] = 20;
 		CacheManager mng = new CacheManager(1, memory);
