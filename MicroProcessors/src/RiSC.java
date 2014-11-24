@@ -14,6 +14,13 @@ public class RiSC {
 	static Cache[] caches;
 	static int[]memory = new int[64];
 	static int pc = 0;
+	
+	public static void CacheInput() throws IOException{
+		BufferedReader r = new BufferedReader(new InputStreamReader(System.in));
+		System.out.println("Enter the cache geometry in this format: /n [R] [C] [M] " +
+				"/n [Hit Writing Policy]");
+	}
+	
 	public static void Input() throws IOException{
 		BufferedReader r = new BufferedReader(new InputStreamReader(System.in));
 		System.out.println("Enter the starting address of the PC");
@@ -28,20 +35,19 @@ public class RiSC {
 			String op = "";
 			
 			switch(instruction){
-			case "LW": op = "0000"; break;
-			case "SW": op = "0001"; break;
-			case "JMP": op = "0010"; break;
-			case "BEQ": op = "0011"; break;
-			case "JALR": op = "0100"; break;
-			case "RET": op = "0101"; break;
-			case "ADD": op = "0110"; break;
-			case "SUB": op = "0111"; break;
-			case "ADDI": op = "1000"; break;
-			case "NAND": op = "1001"; break;
-			case "MUL": op = "1010"; break;
+			case "LW": op = "100"; break;
+			case "SW": op = "101"; break;
+			case "JMP": op = "0000"; break;
+			case "BEQ": op = "110"; break;
+			case "JALR": op = "0001"; break;
+			case "RET": op = "0010"; break;
+			case "ADD": op = "0011"; break;
+			case "SUB": op = "0100"; break;
+			case "ADDI": op = "111"; break;
+			case "NAND": op = "0101"; break;
+			case "MUL": op = "0110"; break;
 			default : System.out.println("ERROR KATEL!");return;
 			}
-			
 			
 			while(tkn.hasMoreTokens()){
 				String val = tkn.nextToken();
