@@ -21,20 +21,31 @@ public class CacheEntry {
 	}
 	
 	private void setFields() {
+		System.out.println("~~~~~~~~~~~~~~~ Cache Enry ~~~~~~~~~~~~");
 		int temp = dispSize;
 		for(int i=0;i< temp;i++)
-			if(((1 << i) & address) == 1)
+			if(((1 << i) & address) != 0)
 				disp |= (1 << i);
 
 		temp += indexSize;
-		for(int i=disp; i < temp;i++)
-			if(((1 << i) & address) == 1)
-				index |= (1 << (i - disp));
+		for(int i=dispSize; i < temp;i++)
+			if(((1 << i) & address) != 0)
+				index |= (1 << (i - dispSize));
 
 		temp += tagSize;
-		for(int i=index;i < temp;i++)
-			if(((1 << i) & address) == 1)
-				tag |= (1 << i) & address;
+		for(int i=temp - tagSize;i < temp;i++)
+			if(((1 << i) & address) != 0)
+				tag |= (1 << (i-dispSize - indexSize));
+		
+		System.out.println("Address " + address);
+		System.out.println("Index " + index);
+		System.out.println("Disp " + disp);
+		System.out.println("value " + value);
+		System.out.println("tag " + tag);
+		System.out.println("indexSize " + indexSize);
+		System.out.println("dispSie " + dispSize);
+		System.out.println("tagsize " + tagSize);
+		System.out.println("~~~~~~~~~~~~~~~ Cache Enry ~~~~~~~~~~~~");
 	}
 	
 	public int getTag() {
