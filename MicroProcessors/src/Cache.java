@@ -4,14 +4,16 @@ import java.util.ArrayList;
 public class Cache {
 	
 	private ArrayList<CacheEntry[]>[] dataCache, instructionCache;
-	private int tagSize, indexSize, dispSize, associativity;
-	private int setRecords, blockWidth;
+	private int tagSize, indexSize, dispSize, associativity, writeBufferSize;
+	private int setRecords, blockWidth, memCall, hits, misses, accessTime;
 	private double[][] dataUsageTable;
 	private double[][] insUsageTable;
-	private boolean replacePolicy;
+	// writePolicy 1 -> through, 0 -> back
+	private boolean replacePolicy, writePolicy;
 	private short[] memory;
+	private ArrayList<CacheEntry> writeBuffer;
 
-	public Cache(int S, int L, int M, boolean replacePolicy, short[] memory, int cycles) {
+	public Cache(int S, int L, int M, boolean replacePolicy, boolean writePolicy, short[] memory, int accessTime) {
 //		To be fully associative, enter M = C
 		int C = S / L;
 		setRecords = C / M;
@@ -28,17 +30,20 @@ public class Cache {
 		insUsageTable = new double[M][setRecords];
 		this.replacePolicy = replacePolicy;
 		this.memory = memory;
+		writeBuffer = new ArrayList<CacheEntry>();
+		this.writeBufferSize = 5;
+		this.accessTime = accessTime;
 		System.out.println("Sets " + associativity + " wid " + blockWidth + " lines " + setRecords );
 		initCaches();
 	}
-	
+
 	private void initCaches() {
 		for(int i=0;i < dataCache.length;i++) {
 			dataCache[i] = new ArrayList<CacheEntry[]>();
 			instructionCache[i] = new ArrayList<CacheEntry[]>();
 		}
 	}
-	
+
 	public void hardInsert(int address, int value, String type) {
 		System.out.println("ana fe hard insert");
 		if(type.equals("Data")) {
@@ -57,7 +62,15 @@ public class Cache {
 				}
 				CacheEntry[] lis = new CacheEntry[blockWidth];
 				lis[entry.getDisp()] = entry;
-				
+
+				for(int i=0;i<dataCache[index].get(pos).length;i++) {
+					if(dataCache[index].get(pos)[i].isDirty()) {
+						short val = (short)dataCache[index].get(pos)[i].getValue();
+						int addr = dataCache[index].get(pos)[i].getAddress();
+						memory[addr] = val;
+						memCall++;
+					}
+				}
 				for(int x=1; entry.getDisp() - x > -1; x++) {
 					CacheEntry en = new CacheEntry(tagSize, indexSize, dispSize, entry.getAddress() - x);
 					en.setValue(memory[address-x]);
@@ -70,6 +83,7 @@ public class Cache {
 					lis[en.getDisp()] = en;
 					dataUsageTable[index][pos] = System.currentTimeMillis();
 				}
+				dataCache[index].remove(pos);
 				dataCache[index].add(pos, lis);
 				dataUsageTable[index][pos]= System.currentTimeMillis();
 			}else {
@@ -98,6 +112,35 @@ public class Cache {
 			}
 		}
 		
+	}
+
+	public void wrtieEntry(CacheEntry entry, String type, int newVal) {
+		if(type.equals("Data")) {
+			if(this.getEntry(entry, type) != null) {
+				// write hit
+				if(writePolicy) {
+					// through
+					if(writeBuffer.size() < writeBufferSize){
+						writeBuffer.add(entry);
+					}else {
+						CacheEntry toWrite = writeBuffer.get(0);
+						writeBuffer.remove(0);
+						memCall++;
+						memory[toWrite.getAddress()] = (short)toWrite.getValue();
+						writeBuffer.add(entry);
+					}
+				}else {
+					entry.setDirty();
+					entry.setValue(newVal);
+				}
+			}else {
+				if(this.softInsert(entry.getAddress(), newVal, type)) {
+					return;
+				}
+				this.hardInsert(entry.getAddress(), newVal, type);
+			}
+
+		}
 	}
 
 	public boolean softInsert(int address, int value, String type) {
@@ -148,6 +191,7 @@ public class Cache {
 		return false;
 	}
 
+
 	public Integer getEntry(CacheEntry entry, String cacheType) {
 		int index, tag, disp;
 		Integer searched = null;
@@ -187,6 +231,7 @@ public class Cache {
 		this.tagSize = tag;
 	}
 
+
 	public int getIndex() {
 		return indexSize;
 	}
@@ -202,5 +247,4 @@ public class Cache {
 	public void setDisp(int disp) {
 		this.dispSize = disp;
 	}
-
 }

@@ -3,6 +3,16 @@ public class CacheEntry {
 	
 	private int tagSize, indexSize, dispSize;
 	private int tag, index, disp, value, address;
+	private boolean dirtyBit;
+	
+	
+	public void setDirty() {
+		dirtyBit = true;
+	}
+
+	public boolean isDirty() {
+		return dirtyBit;
+	}
 
 	public CacheEntry(int tag, int index, int disp, int address) {
 		tagSize = tag;
