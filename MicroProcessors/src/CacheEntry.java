@@ -3,6 +3,16 @@ public class CacheEntry {
 	
 	private int tagSize, indexSize, dispSize;
 	private int tag, index, disp, value, address;
+	private boolean dirtyBit;
+	
+	
+	public void setDirty() {
+		dirtyBit = true;
+	}
+
+	public boolean isDirty() {
+		return dirtyBit;
+	}
 
 	public CacheEntry(int tag, int index, int disp, int address) {
 		tagSize = tag;
@@ -21,7 +31,7 @@ public class CacheEntry {
 	}
 	
 	private void setFields() {
-		System.out.println("~~~~~~~~~~~~~~~ Cache Enry ~~~~~~~~~~~~");
+//		System.out.println("~~~~~~~~~~~~~~~ Cache Enry ~~~~~~~~~~~~");
 		int temp = dispSize;
 		for(int i=0;i< temp;i++)
 			if(((1 << i) & address) != 0)
@@ -37,15 +47,15 @@ public class CacheEntry {
 			if(((1 << i) & address) != 0)
 				tag |= (1 << (i-dispSize - indexSize));
 		
-		System.out.println("Address " + address);
-		System.out.println("Index " + index);
-		System.out.println("Disp " + disp);
-		System.out.println("value " + value);
-		System.out.println("tag " + tag);
-		System.out.println("indexSize " + indexSize);
-		System.out.println("dispSie " + dispSize);
-		System.out.println("tagsize " + tagSize);
-		System.out.println("~~~~~~~~~~~~~~~ Cache Enry ~~~~~~~~~~~~");
+//		System.out.println("Address " + address);
+//		System.out.println("Index " + index);
+//		System.out.println("Disp " + disp);
+//		System.out.println("value " + value);
+//		System.out.println("tag " + tag);
+//		System.out.println("indexSize " + indexSize);
+//		System.out.println("dispSie " + dispSize);
+//		System.out.println("tagsize " + tagSize);
+//		System.out.println("~~~~~~~~~~~~~~~ Cache Enry ~~~~~~~~~~~~");
 	}
 	
 	public int getTag() {

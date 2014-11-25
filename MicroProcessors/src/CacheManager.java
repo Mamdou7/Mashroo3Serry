@@ -6,7 +6,7 @@ public class CacheManager {
 	
 	private Cache[] caches;
 	private int hits, misses, cacheLevel, memCalls;
-	private int nextLevelToInsertInto;
+	private int nextLevelToInsertInto, dataNextLevelToInsertInto;
 	private short[] memory;
 
 	public CacheManager(int levels, short[] mem) {
@@ -15,11 +15,45 @@ public class CacheManager {
 		//Create caches TODO
 		memory = mem;
 	}
+	
+	public double calcAMAT() {
+		double res = 0;
+		for(int i=0;i<cacheLevel;i++) {
+			int hits = caches[i].getHits();
+			int misses = caches[i].getMisses();
+			res += hits*caches[i].getAccess() + (misses / (hits+misses)) * caches[i].getPenalty();
+		}
+		return res;
+	}
 
-	public void createCache(int S, int L, int M, boolean replacePolicy, int cycles) {
-		caches[cacheLevel++] = new Cache(S, L, M, replacePolicy, memory, cycles);
+	public void calcHitsMisses() {
+		for(int i=0;i<cacheLevel;i++)
+			System.out.printf("Cache Level %d:\nHits = %d\n Misses = %d\n", (i+1), caches[i].getHits(), caches[i].getMisses());
+	}
+
+	public void createCache(int S, int L, int M, boolean replacePolicy, boolean writePolicy, int access, int penalty) {
+		caches[cacheLevel++] = new Cache(S, L, M, replacePolicy, writePolicy, memory, access, penalty);
 	}
 	
+	public void writeEntry(int address, String type, int newVal) {
+		for(int i=0;i < cacheLevel;i++) {
+			int tagSize = caches[i].getTag();
+			int indexSize = caches[i].getIndex();
+			int dispSize = caches[i].getDisp();
+			CacheEntry toAdd = new CacheEntry(tagSize, indexSize, dispSize, address);
+			Integer ret = caches[i].getEntry(toAdd, type);
+			if(ret == null) {
+				getFromMem(address, type);
+				return;
+			}else {
+				caches[i].wrtieEntry(toAdd, type, newVal);
+			}
+			// assuming all levels have the same miss and hit rates TODO
+//			CacheEntry toAdd2 = new CacheEntry(tagSize, indexSize, dispSize, 5);
+//			Integer t = caches[i].getEntry(toAdd2, type);
+//			System.out.println("DOUND " + ret + " " + t);
+		}
+	}
 	public Integer getEntry(int address, String type) {
 		// search the caches level by level
 		for(int i=0;i < cacheLevel;i++) {
@@ -81,7 +115,7 @@ public class CacheManager {
 		insertIntoCache(address, value, type);
 		return value;
 	}
-	
+
 	private void insertIntoCache(int address, int value, String type) {
 		if(type.equals("Data")) {
 			for(int i=0;i<cacheLevel;i++) {
@@ -89,9 +123,9 @@ public class CacheManager {
 					return;
 				}
 			}
-			caches[nextLevelToInsertInto].hardInsert(address, value, "Data");
-			nextLevelToInsertInto++;
-			nextLevelToInsertInto %= cacheLevel;
+			caches[dataNextLevelToInsertInto].hardInsert(address, value, "Data");
+			dataNextLevelToInsertInto++;
+			dataNextLevelToInsertInto %= cacheLevel;
 		}else {
 			for(int i=0;i<cacheLevel;i++) {
 				if(caches[i].softInsert(address, value, "inst")) {
@@ -103,5 +137,4 @@ public class CacheManager {
 			nextLevelToInsertInto %= cacheLevel;
 		}
 	}
-
 }
