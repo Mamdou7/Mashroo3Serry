@@ -16,12 +16,13 @@ public class Cache {
 		int C = S / L;
 		setRecords = C / M;
 		blockWidth = L;
-		dataCache = new ArrayList[M];
-		instructionCache = new ArrayList[M];
+		dataCache = new ArrayList[C/M];
+		instructionCache = new ArrayList[C/M];
 		dispSize = (int)(Math.log(L)/Math.log(2));
+		//TODO log m
 		indexSize = (int)Math.ceil(Math.log(C/M)/Math.log(2));
 		tagSize = 32 - indexSize - dispSize;
-		
+
 		associativity = M;
 		dataUsageTable = new double[M][setRecords];
 		insUsageTable = new double[M][setRecords];

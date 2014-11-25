@@ -41,7 +41,7 @@ public class RiSC {
 //            if(x.equals("LRU")) type = true; 
 //           System.out.println("Please enter the Number of cycles required to access");
 //            int cycles = Integer.parseInt(input.readLine());
-		mng.createCache(12, 4, 3, true,1);
+		mng.createCache(4, 4, 1, true,1);
 //		}
 //		
 //		Input();
@@ -66,7 +66,6 @@ public class RiSC {
 		System.out.println("-----------> " + mng.getMisses() + " " + mng.getMemCalls() + " " + mng.getHits() + " " + val);
 		val = mng.getEntry(4, "Data");
 		System.out.println("-----------> " + mng.getMisses() + " " + mng.getMemCalls() + " " + mng.getHits() + " " + val);
-		
 	}
 
 		

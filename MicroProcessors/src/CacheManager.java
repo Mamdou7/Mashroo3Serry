@@ -81,7 +81,7 @@ public class CacheManager {
 		insertIntoCache(address, value, type);
 		return value;
 	}
-	
+
 	private void insertIntoCache(int address, int value, String type) {
 		if(type.equals("Data")) {
 			for(int i=0;i<cacheLevel;i++) {
