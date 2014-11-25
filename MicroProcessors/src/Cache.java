@@ -5,7 +5,7 @@ public class Cache {
 	
 	private ArrayList<CacheEntry[]>[] dataCache, instructionCache;
 	private int tagSize, indexSize, dispSize, associativity, writeBufferSize;
-	private int setRecords, blockWidth, memCall, hits, misses, accessTime;
+	private int setRecords, blockWidth, memCall, hits, misses, accessTime, missPenalty;
 	private double[][] dataUsageTable;
 	private double[][] insUsageTable;
 	// writePolicy 1 -> through, 0 -> back
@@ -13,7 +13,7 @@ public class Cache {
 	private short[] memory;
 	private ArrayList<CacheEntry> writeBuffer;
 
-	public Cache(int S, int L, int M, boolean replacePolicy, boolean writePolicy, short[] memory, int accessTime) {
+	public Cache(int S, int L, int M, boolean replacePolicy, boolean writePolicy, short[] memory, int accessTime, int missPenalty) {
 //		To be fully associative, enter M = C
 		int C = S / L;
 		setRecords = C / M;
@@ -24,7 +24,7 @@ public class Cache {
 		//TODO log m
 		indexSize = (int)Math.ceil(Math.log(C/M)/Math.log(2));
 		tagSize = 32 - indexSize - dispSize;
-
+		this.missPenalty = missPenalty;
 		associativity = M;
 		dataUsageTable = new double[M][setRecords];
 		insUsageTable = new double[M][setRecords];
@@ -37,13 +37,27 @@ public class Cache {
 		initCaches();
 	}
 
+	public int getMisses() {
+		return misses;
+	}
+	
+	public int getHits() {
+		return hits;
+	}
+	
+	public int getAccess() {
+		return accessTime;
+	}
 	private void initCaches() {
 		for(int i=0;i < dataCache.length;i++) {
 			dataCache[i] = new ArrayList<CacheEntry[]>();
 			instructionCache[i] = new ArrayList<CacheEntry[]>();
 		}
 	}
-
+	
+	public int getPenalty() {
+		return missPenalty;
+	}
 	public void hardInsert(int address, int value, String type) {
 		System.out.println("ana fe hard insert");
 		if(type.equals("Data")) {
@@ -199,6 +213,10 @@ public class Cache {
 		index = entry.getIndex();
 		disp = entry.getDisp();
 		searched = search(index, disp, tag, cacheType);
+		if(searched == null)
+			misses++;
+		else
+			hits++;
 		return searched;
 	}
 

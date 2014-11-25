@@ -15,9 +15,24 @@ public class CacheManager {
 		//Create caches TODO
 		memory = mem;
 	}
+	
+	public double calcAMAT() {
+		double res = 0;
+		for(int i=0;i<cacheLevel;i++) {
+			int hits = caches[i].getHits();
+			int misses = caches[i].getMisses();
+			res += hits*caches[i].getAccess() + (misses / (hits+misses)) * caches[i].getPenalty();
+		}
+		return res;
+	}
 
-	public void createCache(int S, int L, int M, boolean replacePolicy, boolean writePolicy, int access) {
-		caches[cacheLevel++] = new Cache(S, L, M, replacePolicy, writePolicy, memory, access);
+	public void calcHitsMisses() {
+		for(int i=0;i<cacheLevel;i++)
+			System.out.printf("Cache Level %d:\nHits = %d\n Misses = %d\n", (i+1), caches[i].getHits(), caches[i].getMisses());
+	}
+
+	public void createCache(int S, int L, int M, boolean replacePolicy, boolean writePolicy, int access, int penalty) {
+		caches[cacheLevel++] = new Cache(S, L, M, replacePolicy, writePolicy, memory, access, penalty);
 	}
 	
 	public void writeEntry(int address, String type, int newVal) {
