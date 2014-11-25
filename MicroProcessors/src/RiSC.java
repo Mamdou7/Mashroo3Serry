@@ -16,6 +16,7 @@ public class RiSC {
 	static Cache[] caches;
 	static short[]memory = new short[64*1024/16];
 	static int pc = 0;
+	static CacheManager mng;
 	
 
 	public static void main(String[] args) throws Exception {
@@ -27,7 +28,7 @@ public class RiSC {
 //		
 //		int cashlevels = Integer.parseInt(input.readLine());
 //		
-		CacheManager mng = new CacheManager(1, memory);
+		 mng = new CacheManager(1, memory);
 //		// LRU TRUE       RANDOM FALSE
 //		for(int i=0;i<cashlevels;i++) {
 //			System.out.println("Enter S L M ");
@@ -41,38 +42,46 @@ public class RiSC {
 //            if(x.equals("LRU")) type = true; 
 //           System.out.println("Please enter the Number of cycles required to access");
 //            int cycles = Integer.parseInt(input.readLine());
-		mng.createCache(12, 4, 3, true,1);
+		mng.createCache(1, 1, 1, true,1);
 //		}
-//		
-//		Input();
-//		Execute();
+		
+		registers[1] = 5;
+		registers[2] = 5;
 		memory[4] = 5;
 		memory[5] = 10;
 		memory[6] = 20;
 		memory[7] = 30;
 		memory[12] = 50;
-		int val = mng.getEntry(5, "Data");
-		System.out.println("-----------> " + mng.getMisses() + " " + mng.getMemCalls() + " " + mng.getHits() + " " + val);
-		val = mng.getEntry(6, "Data");
-		System.out.println("-----------> " + mng.getMisses() + " " + mng.getMemCalls() + " " + mng.getHits() + " " + val);
-		val = mng.getEntry(5, "Data");
-		System.out.println("-----------> " + mng.getMisses() + " " + mng.getMemCalls() + " " + mng.getHits() + " " + val);
-		val = mng.getEntry(4, "Data");
-		System.out.println("-----------> " + mng.getMisses() + " " + mng.getMemCalls() + " " + mng.getHits() + " " + val);
-		val = mng.getEntry(7, "Data");
-		System.out.println("-----------> " + mng.getMisses() + " " + mng.getMemCalls() + " " + mng.getHits() + " " + val);
-		System.out.println("\n\nINsert 7aga gdeda\n\n");
-		val = mng.getEntry(12, "Data");
-		System.out.println("-----------> " + mng.getMisses() + " " + mng.getMemCalls() + " " + mng.getHits() + " " + val);
-		val = mng.getEntry(4, "Data");
-		System.out.println("-----------> " + mng.getMisses() + " " + mng.getMemCalls() + " " + mng.getHits() + " " + val);
+		Input();
+		Execute();
+		System.out.println(caches);
+		System.out.println(registers[1]);
+
 		
+
+//		int val = mng.getEntry(5, "Data");
+//		System.out.println("-----------> " + mng.getMisses() + " " + mng.getMemCalls() + " " + mng.getHits() + " " + val);
+//		val = mng.getEntry(6, "Data");
+//		System.out.println("-----------> " + mng.getMisses() + " " + mng.getMemCalls() + " " + mng.getHits() + " " + val);
+//		val = mng.getEntry(5, "Data");
+//		System.out.println("-----------> " + mng.getMisses() + " " + mng.getMemCalls() + " " + mng.getHits() + " " + val);
+//		val = mng.getEntry(4, "Data");
+//		System.out.println("-----------> " + mng.getMisses() + " " + mng.getMemCalls() + " " + mng.getHits() + " " + val);
+//		val = mng.getEntry(7, "Data");
+//		System.out.println("-----------> " + mng.getMisses() + " " + mng.getMemCalls() + " " + mng.getHits() + " " + val);
+//		System.out.println("\n\nINsert 7aga gdeda\n\n");
+//		val = mng.getEntry(12, "Data");
+//		System.out.println("-----------> " + mng.getMisses() + " " + mng.getMemCalls() + " " + mng.getHits() + " " + val);
+//		val = mng.getEntry(4, "Data");
+//		System.out.println("-----------> " + mng.getMisses() + " " + mng.getMemCalls() + " " + mng.getHits() + " " + val);
+//		
 	}
 
 		
 		
 	
 	public static void decode(short instruction) {
+		System.out.println(Integer.toBinaryString(instruction));
 		
 	if((instruction & (1<<15)) == 0 ){	
 	int opcode =  instruction & ((1<<13) | (1<<14) | (1<<15)|(1<<12));
@@ -140,7 +149,7 @@ public class RiSC {
 	}
 
 	private static void store(int rd, int rs, short imm) {
-		short address = (short) (registers[rs] + imm);
+	//	short address = (short) (registers[rs] + imm);
 	//	write(address,registers[rd]);
 		
 	}
@@ -150,9 +159,10 @@ public class RiSC {
 			System.out.println("LA2AAAA 7EELAK");
 			return;
 		}
-		short address = (short) (registers[rs]+imm);
-	//	registers[rd] = read(address);
-		
+	//	short address = (short) (registers[rs]+imm);
+		registers[rd] = mng.getEntry(registers[rs]+imm, "Data").shortValue();
+		System.out.println("HITS = "+mng.getHits());
+		System.out.println("MISSES = "+mng.getMisses());
 	}
 
 	private static void addImmediate(int rd, int rs, short imm) {
@@ -160,6 +170,7 @@ public class RiSC {
 			System.out.println("RAYEE7 FEEEN");
 			return;
 		}
+		
 		registers[rd]=(short) (registers[rs]+imm);
 		
 	}
@@ -212,17 +223,20 @@ public class RiSC {
 			return;
 		}
 		registers[rd] = (short) (registers[rs]+registers[rt]);
-	//	System.out.println(registers[rd]);
+		System.out.println(registers[rd]);
 	}
 	
 	public static void Execute(){
 		
 		while(true){
+			
 			int instruction = memory[pc];
 //			System.out.println(instruction+" "+Integer.parseInt("0111000000000000",2));
 			if(instruction==Integer.parseInt("0111000000000000",2))break;
 			decode((short)instruction);
 			pc++;
+			
+			System.out.println("THE PROGRAM COUNTER IS = TO "+pc);
 		}
 		
 	}
@@ -274,8 +288,14 @@ public class RiSC {
 					op = op+register;
 					break;
 					
-				default : String imm = Integer.toBinaryString(Integer.parseInt(val));
-				while(imm.length()<4){
+				default : String bom = Integer.toBinaryString(Integer.parseInt(val));
+				String imm = "";
+				int j =1;
+				for(int i= 0 ; i < 7 && (bom.length()-j)>=0 ; i++){
+					imm = bom.charAt(bom.length()-j)+imm;
+					j++;
+				}
+				while(imm.length()<7){
 					imm = "0"+imm;
 				}
 				op= op+imm;
@@ -285,9 +305,9 @@ public class RiSC {
 			while(op.length()<16){
 				op = op+"0";
 			}
-//			System.out.println("--> "+op+" "+Short.parseShort(op,2));
-			memory[start]=Short.parseShort(op,2);
-//			System.out.println("--> "+memory[start]);
+			System.out.println("--> "+op+" "+Integer.parseInt(op,2));
+			memory[start]=(short) Integer.parseInt(op,2);
+//			System.out.println("--> "+Integer.toBinaryString(memory[start])+" "+memory[start]);
 			start++;
 			if(line.equals("END"))break;
 			

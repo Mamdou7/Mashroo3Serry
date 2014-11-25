@@ -69,7 +69,9 @@ public class Cache {
 					lis[en.getDisp()] = en;
 					dataUsageTable[index][pos] = System.currentTimeMillis();
 				}
+				dataCache[index].remove(pos);
 				dataCache[index].add(pos, lis);
+				System.out.println("SIZE NOW " + dataCache[index].size());
 				dataUsageTable[index][pos]= System.currentTimeMillis();
 			}else {
 				int rand = (int)(Math.random() * setRecords) + 1;
